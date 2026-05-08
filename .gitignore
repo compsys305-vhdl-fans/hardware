@@ -17,8 +17,6 @@ output_files/
 log/
 
 # quartus files
-*.qpf
-*.qsf
 *.qws
 *.sopcinfo
 qar_info.json
