@@ -64,6 +64,17 @@ ARCHITECTURE behaviour OF vga_tb IS
     CONSTANT TRACE_EVERY_N       : POSITIVE := 1;      -- 1 = log every 25MHz tick
     CONSTANT TRANSCRIPT_EVERY_N  : POSITIVE := 2000;   -- reduce transcript spam
 
+    -- Expected 640x480@60-ish timing, matching MiniprojectResources/vga_sync.vhd.
+    CONSTANT H_VISIBLE_LAST : INTEGER := 639;
+    CONSTANT H_SYNC_START   : INTEGER := 659;
+    CONSTANT H_SYNC_END     : INTEGER := 755;
+    CONSTANT H_LAST         : INTEGER := 799;
+    CONSTANT V_VISIBLE_LAST : INTEGER := 479;
+    CONSTANT V_COUNT_TICK   : INTEGER := 699;
+    CONSTANT V_SYNC_START   : INTEGER := 493;
+    CONSTANT V_SYNC_END     : INTEGER := 494;
+    CONSTANT V_LAST         : INTEGER := 524;
+
     FILE trace_f : TEXT OPEN WRITE_MODE IS "log/vga_trace.csv";
 BEGIN
 
@@ -117,6 +128,13 @@ BEGIN
         VARIABLE cur_r : STD_LOGIC;
         VARIABLE cur_g : STD_LOGIC;
         VARIABLE cur_b : STD_LOGIC;
+
+        VARIABLE expected_x      : INTEGER := 1;
+        VARIABLE expected_y      : INTEGER := 0;
+        VARIABLE current_x       : INTEGER := 0;
+        VARIABLE expected_req_on : STD_LOGIC;
+        VARIABLE expected_hsync  : STD_LOGIC;
+        VARIABLE expected_vsync  : STD_LOGIC;
     BEGIN
         finished_i <= '0';
         error_code_i <= x"00";
@@ -140,6 +158,8 @@ BEGIN
         last_y := -1;
         have_prev := FALSE;
         prev_req_on := '0';
+        expected_x := 1;
+        expected_y := 0;
 
         WHILE finished_i = '0' LOOP
             WAIT UNTIL RISING_EDGE(clock_25MHz);
@@ -180,6 +200,49 @@ BEGIN
                 END IF;
             END IF;
 
+            IF (expected_x <= H_VISIBLE_LAST) AND (expected_y <= V_VISIBLE_LAST) THEN
+                expected_req_on := '1';
+            ELSE
+                expected_req_on := '0';
+            END IF;
+
+            IF (expected_x >= H_SYNC_START) AND (expected_x <= H_SYNC_END) THEN
+                expected_hsync := '0';
+            ELSE
+                expected_hsync := '1';
+            END IF;
+
+            IF (expected_y >= V_SYNC_START) AND (expected_y <= V_SYNC_END) THEN
+                expected_vsync := '0';
+            ELSE
+                expected_vsync := '1';
+            END IF;
+
+            -- Check timing against the known-good VGA_SYNC counter behaviour.
+            IF in_screen /= expected_req_on THEN
+                error_code_i <= x"30";
+                finished_i <= '1';
+                WAIT;
+            ELSIF hsync /= expected_hsync THEN
+                error_code_i <= x"31";
+                finished_i <= '1';
+                WAIT;
+            ELSIF vsync /= expected_vsync THEN
+                error_code_i <= x"32";
+                finished_i <= '1';
+                WAIT;
+            ELSIF expected_req_on = '1' THEN
+                IF screen.pixel_x /= expected_x THEN
+                    error_code_i <= x"33";
+                    finished_i <= '1';
+                    WAIT;
+                ELSIF screen.pixel_y /= expected_y THEN
+                    error_code_i <= x"34";
+                    finished_i <= '1';
+                    WAIT;
+                END IF;
+            END IF;
+
             -- Track last requested coordinates for trace/debug.
             IF in_screen = '1' THEN
                 last_x := screen.pixel_x;
@@ -208,6 +271,19 @@ BEGIN
             prev_b := cur_b;
             prev_req_on := in_screen;
             have_prev := TRUE;
+
+            current_x := expected_x;
+            IF (expected_y >= V_LAST) AND (current_x >= V_COUNT_TICK) THEN
+                expected_y := 0;
+            ELSIF current_x = V_COUNT_TICK THEN
+                expected_y := expected_y + 1;
+            END IF;
+
+            IF current_x = H_LAST THEN
+                expected_x := 0;
+            ELSE
+                expected_x := expected_x + 1;
+            END IF;
 
             IF in_screen = '1' THEN
                 pixels_generated := pixels_generated + 1;
