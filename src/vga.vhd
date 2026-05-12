@@ -43,16 +43,14 @@ BEGIN
                 vga_s.hsync <= '1';
             END IF;
 
-            -- vertical sync
-            IF (vga_s.pixel_x = 799) THEN
-                IF (vga_s.pixel_y = 524) THEN
-                    vga_s.pixel_y <= 0;
-                ELSE
-                    vga_s.pixel_y <= vga_s.pixel_y + 1;
-                END IF;
+            -- Match the known-good DE0-CV VGA_SYNC timing.
+            IF (vga_s.pixel_y >= 524) AND (vga_s.pixel_x >= 699) THEN
+                vga_s.pixel_y <= 0;
+            ELSIF (vga_s.pixel_x = 699) THEN
+                vga_s.pixel_y <= vga_s.pixel_y + 1;
             END IF;
 
-            IF (vga_s.pixel_y <= 491) AND (vga_s.pixel_y >= 490) THEN
+            IF (vga_s.pixel_y <= 494) AND (vga_s.pixel_y >= 493) THEN
                 vga_s.vsync <= '0';
             ELSE
                 vga_s.vsync <= '1';
