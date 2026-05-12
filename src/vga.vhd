@@ -7,12 +7,12 @@ USE PROJECT_CONFIG.TYPES.ALL;
 ENTITY vga IS
     PORT (
         clock_25MHz : IN STD_LOGIC;
-        r_in        : IN STD_LOGIC;
-        g_in        : IN STD_LOGIC;
-        b_in        : IN STD_LOGIC;
-        r_out       : OUT STD_LOGIC;
-        g_out       : OUT STD_LOGIC;
-        b_out       : OUT STD_LOGIC;
+        r_in        : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        g_in        : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        b_in        : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+        r_out       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        g_out       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        b_out       : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         hsync       : OUT STD_LOGIC;
         vsync       : OUT STD_LOGIC;
         in_screen   : OUT STD_LOGIC;
@@ -80,9 +80,15 @@ BEGIN
             in_screen <= req_on;
 
             -- drive display outputs
-            r_out <= r_in AND vga_s.video_on;
-            g_out <= g_in AND vga_s.video_on;
-            b_out <= b_in AND vga_s.video_on;
+            IF vga_s.video_on = '1' THEN
+                r_out <= r_in;
+                g_out <= g_in;
+                b_out <= b_in;
+            ELSE
+                r_out <= (OTHERS => '0');
+                g_out <= (OTHERS => '0');
+                b_out <= (OTHERS => '0');
+            END IF;
             hsync <= vga_s.hsync;
             vsync <= vga_s.vsync;
         END IF;
