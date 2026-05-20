@@ -1,2 +1,2 @@
-entity vga is
-end entity;
+ENTITY vga IS
+END ENTITY vga;

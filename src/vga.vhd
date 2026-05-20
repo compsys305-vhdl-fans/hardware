@@ -1,9 +1,8 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 
-LIBRARY hardware;
-USE hardware.vga_types.all;
-
+LIBRARY HARDWARE;
+USE HARDWARE.VGA_TYPES.ALL;
 
 ENTITY vga IS
     PORT (
@@ -20,7 +19,6 @@ ENTITY vga IS
         screen      : OUT SCREEN
     );
 END vga;
-
 
 ARCHITECTURE display OF vga IS
     SIGNAL vga_s        : VGA_SCREEN;

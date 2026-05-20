@@ -1,7 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 
-package vga_types is
+PACKAGE vga_types IS
     TYPE screen IS RECORD
         pixel_x : INTEGER RANGE 0 TO 639;
         pixel_y : INTEGER RANGE 0 TO 479;
@@ -16,4 +16,4 @@ package vga_types is
         video_on_h  : STD_LOGIC;
         video_on_v  : STD_LOGIC;
     END RECORD;
-end;
+END PACKAGE vga_types;
