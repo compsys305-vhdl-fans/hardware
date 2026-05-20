@@ -1,0 +1,14 @@
+standard = "1993"
+
+preferred_case = "lower"
+
+### hardware drivers
+[libraries.hardware]
+files = ["src/**/*.vhd"]
+is_third_party = false
+
+### linting rules
+[lint]
+unused = "error"
+# disable linting for the work library
+unnecessary_work_library = false
