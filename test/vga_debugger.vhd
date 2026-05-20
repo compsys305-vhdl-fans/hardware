@@ -1,0 +1,2 @@
+ENTITY vga IS
+END ENTITY vga;
