@@ -31,15 +31,14 @@ ARCHITECTURE behavior OF mouse IS
 	SIGNAL in_char, out_char								: STD_LOGIC_VECTOR(7 DOWNTO 0);
 	SIGNAL new_mouse_x, new_mouse_y 						: STD_LOGIC_VECTOR(9 DOWNTO 0);
 	SIGNAL mouse_x, mouse_y 								: STD_LOGIC_VECTOR(9 DOWNTO 0);
-	SIGNAL in_cnt, out_cnt, out_msb 						: STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL in_cnt, out_cnt			 						: STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL packet_count 									: STD_LOGIC_VECTOR(1 DOWNTO 0);
 	SIGNAL in_shift 										: STD_LOGIC_VECTOR(8 DOWNTO 0);
 	SIGNAL out_shift 										: STD_LOGIC_VECTOR(10 DOWNTO 0);
 	SIGNAL packet_char1, packet_char2, packet_char3			: STD_LOGIC_VECTOR(7 DOWNTO 0);
-	SIGNAL data_ready, read_char							: STD_LOGIC;
-	SIGNAL cursor, iready_set, break, toggle_next,
-		output_ready, send_char, send_data					: STD_LOGIC;
-	SIGNAL mouse_data_dir, mouse_data_out, mouse_data_buf	: STD_LOGIC;
+	SIGNAL read_char										: STD_LOGIC;
+	SIGNAL iready_set, output_ready, send_char, send_data	: STD_LOGIC;
+	SIGNAL mouse_data_dir, mouse_data_buf	: STD_LOGIC;
 	SIGNAL mouse_clk_dir, mouse_clk_buf, mouse_clk_filter   : STD_LOGIC;
 	SIGNAL filter 											: STD_LOGIC_VECTOR(7 DOWNTO 0);
 
